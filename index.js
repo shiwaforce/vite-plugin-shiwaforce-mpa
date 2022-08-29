@@ -32,6 +32,11 @@ function rewritePages() {
 	const rules = [];
 	const { pageDir, pageName, mimeCheck } = Config;
 
+	rules.push({
+		from: '/',
+		to: `${pageDir}/index.html`
+	});
+
 	fs.readdirSync(resolver(Config.root, pageDir)).forEach(page => {
 		rules.push({
 			from: new RegExp(`^/${page}/${pageName}$`),
@@ -78,7 +83,7 @@ module.exports = (userConfig = {}) => {
 	};
 
 	return {
-		name: 'vite-plugin-mpa',
+		name: 'vite-plugin-shiwaforce-mpa',
 		enforce: 'pre',
 
 		config(config) {
