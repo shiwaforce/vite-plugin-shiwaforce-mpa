@@ -30,12 +30,7 @@ function getPageNames() {
 
 function rewritePages() {
 	const rules = [];
-	const { pageDir, pageName, mimeCheck } = Config;
-
-	rules.push({
-		from: '/',
-		to: `${pageDir}/index.html`
-	});
+	const { pageDir, pageName, mimeCheck, defaultPageName } = Config;
 
 	fs.readdirSync(resolver(Config.root, pageDir)).forEach(page => {
 		rules.push({
@@ -55,6 +50,16 @@ function rewritePages() {
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 	});
+
+	rules.push({
+		from: new RegExp('^\/$'),
+		to: `/${pageDir}/${defaultPageName}.html`
+	});
+	rules.push({
+		from: new RegExp('^$'),
+		to: `/${pageDir}/${defaultPageName}.html`
+	});
+
 	return (req, res, next) => {
 		const name = req.url;
 
@@ -89,16 +94,17 @@ module.exports = (userConfig = {}) => {
 		config(config) {
 			Config = config;
 			config.root = config.root || process.cwd();
+			config.defaultPageName = 'index';
 			config.pageDir = defaultConfig.pageDir;
 			config.removePageDirs = defaultConfig.removePageDirs;
 			config.pageName = defaultConfig.pageName;
 			config.pageNames = getPageNames();
 			config.mimeCheck = defaultConfig.mimeCheck;
+			config.server = config.server || {};
 			config.build = config.build || {};
 			config.build.outDir = config.build.outDir || 'dist';
 			config.build.rollupOptions = config.build.rollupOptions || {};
 			config.build.rollupOptions.input = getPageRoots();
-			config.server = config.server || {};
 		},
 
 		configureServer({ middlewares: app }) {
