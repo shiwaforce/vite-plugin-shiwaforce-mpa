@@ -1,0 +1,19 @@
+{
+  "name": "vite-plugin-shiwaforce-mpa",
+  "version": "1.0.0",
+  "description": "Multi page application support for Vite 3.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint index.js"
+  },
+  "author": "Orsós Ádám <adam.orsos@shiwaforce.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mime-types": "2.1.35"
+  },
+  "devDependencies": {
+    "eslint": "8.23.0",
+    "eslint-config-server-shiwaforce": "1.0.6",
+    "eslint-plugin-import": "2.26.0"
+  }
+}
