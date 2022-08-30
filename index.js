@@ -50,15 +50,16 @@ function rewritePages() {
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 	});
-
-	rules.push({
-		from: new RegExp('^\/$'),
-		to: `/${pageDir}/${defaultPageName}.html`
-	});
-	rules.push({
-		from: new RegExp('^$'),
-		to: `/${pageDir}/${defaultPageName}.html`
-	});
+	if (!Config.interceptor) {
+		rules.push({
+			from: new RegExp('^\/$'),
+			to: `/${pageDir}/${defaultPageName}.html`
+		});
+		rules.push({
+			from: new RegExp('^$'),
+			to: `/${pageDir}/${defaultPageName}.html`
+		});
+	}
 
 	return (req, res, next) => {
 		const name = req.url;
@@ -66,7 +67,9 @@ function rewritePages() {
 		if (mimeCheck) {
 			res.setHeader('Content-Type', mime.lookup(name));
 		}
-
+		if (Config.interceptor) {
+			Config.interceptor(req, res, next);
+		}
 		for (const rule in rules) {
 			if (name.match(rules[rule].from)) {
 				req.url = rules[rule].to;
@@ -79,7 +82,7 @@ function rewritePages() {
 	};
 }
 
-module.exports = (userConfig = {}) => {
+module.exports = (interceptor = null, addServerConfiguration = [], userConfig = {}) => {
 	const defaultConfig = {
 		pageDir: 'pages',
 		pageName: 'index.html',
@@ -105,9 +108,15 @@ module.exports = (userConfig = {}) => {
 			config.build.outDir = config.build.outDir || 'dist';
 			config.build.rollupOptions = config.build.rollupOptions || {};
 			config.build.rollupOptions.input = getPageRoots();
+			config.interceptor = interceptor;
+			config.serverConfigurations = addServerConfiguration;
 		},
 
 		configureServer({ middlewares: app }) {
+			const { serverConfigurations } = Config;
+			for (let i = 0; i < serverConfigurations.length; i++) {
+				app.use(serverConfigurations[i]());
+			}
 			app.use(rewritePages());
 		},
 
