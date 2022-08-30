@@ -62,13 +62,13 @@ function rewritePages() {
 	}
 
 	return (req, res, next) => {
+		if (Config.interceptor) {
+			Config.interceptor(req, res, next);
+		}
 		const name = req.url;
 
 		if (mimeCheck) {
 			res.setHeader('Content-Type', mime.lookup(name));
-		}
-		if (Config.interceptor) {
-			Config.interceptor(req, res, next);
 		}
 		for (const rule in rules) {
 			if (name.match(rules[rule].from)) {
