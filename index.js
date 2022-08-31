@@ -34,19 +34,23 @@ function rewritePages() {
 
 	fs.readdirSync(resolver(Config.root, pageDir)).forEach(page => {
 		rules.push({
-			from: new RegExp(`^/${page}/${pageName}$`),
+			from: new RegExp(`^\/${page}\/${pageName}$`),
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 		rules.push({
-			from: new RegExp(`^/${page}.html$`),
+			from: new RegExp(`^\/${page}.html$`),
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 		rules.push({
-			from: new RegExp(`^/${page}$`),
+			from: new RegExp(`^\/${page}$`),
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 		rules.push({
-			from: new RegExp(`^/${page}/$`),
+			from: new RegExp(`^\/${page}\/$`),
+			to: `/${pageDir}/${page}/${page}.html`
+		});
+		rules.push({
+			from: new RegExp(`^\/${page}\/.+$`),
 			to: `/${pageDir}/${page}/${page}.html`
 		});
 	});
