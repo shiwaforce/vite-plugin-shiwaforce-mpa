@@ -74,14 +74,16 @@ function rewritePages() {
 		if (mimeCheck) {
 			res.setHeader('Content-Type', mime.lookup(name));
 		}
-		for (const rule in rules) {
-			if (name.match(rules[rule].from)) {
-				req.url = rules[rule].to;
-				res.statusCode = 302;
-				break;
+		const mimeType = mime.lookup(name);
+		if (mimeType != 'image/png') {
+			for (const rule in rules) {
+				if (name.match(rules[rule].from)) {
+					req.url = rules[rule].to;
+					res.statusCode = 302;
+					break;
+				}
 			}
 		}
-
 		return next();
 	};
 }
@@ -118,8 +120,8 @@ module.exports = (interceptor = null, addServerConfiguration = [], userConfig = 
 
 		configureServer({ middlewares: app }) {
 			const { serverConfigurations } = Config;
-			for (let i = 0; i < serverConfigurations.length; i++) {
-				app.use(serverConfigurations[i]());
+			for (const serverConfiguration of serverConfigurations) {
+				app.use(serverConfiguration());
 			}
 			app.use(rewritePages());
 		},
