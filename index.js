@@ -114,6 +114,7 @@ module.exports = (interceptor = null, addServerConfiguration = [], userConfig = 
 			config.build.outDir = config.build.outDir || 'dist';
 			config.build.rollupOptions = config.build.rollupOptions || {};
 			config.build.rollupOptions.input = getPageRoots();
+			config.build.assetsDir = defaultConfig.assetsDir || '';
 			config.interceptor = interceptor;
 			config.serverConfigurations = addServerConfiguration;
 		},
@@ -126,13 +127,13 @@ module.exports = (interceptor = null, addServerConfiguration = [], userConfig = 
 			app.use(rewritePages());
 		},
 
-		writeBundle() {
+		closeBundle() {
 			const { pageDir, pageNames } = Config;
 			// Change html-s to relative paths
 			fs.readdirSync(resolver(Config.build.outDir, pageDir)).forEach(page => {
 				const currentPagePlace = resolver(Config.build.outDir, `${pageDir}${path.sep}${page}${path.sep}${page}.html`);
-				const data = fs.readFileSync(currentPagePlace, 'utf8');
-				const result = data.replace(/[=]"\//g, '="/static/' + page + '/');
+				const currentPageData = fs.readFileSync(currentPagePlace, 'utf8');
+				const result = currentPageData.replace(/[=]"\//g, '="/static/' + page + '/');
 				fs.writeFileSync(currentPagePlace, result, 'utf8');
 			});
 
